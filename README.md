@@ -1,5 +1,5 @@
 # Homomorphic Field Trace Revisited : Breaking the Cubic Noise Barrier
-This is an implementation of **Homomorphic Field Trace Revisited : Breaking the Cubic Noise Barrier**, built upon the implementation of '[Refined TFHE Leveled Homomorphic Evaluation and Its Application](https://eprint.iacr.org/2024/1318)', licensed under the MIT license. 
+This is an implementation of '[**Homomorphic Field Trace Revisited : Breaking the Cubic Noise Barrier**'](https://eprint.iacr.org/2025/1088), built upon the implementation of '[Refined TFHE Leveled Homomorphic Evaluation and Its Application](https://eprint.iacr.org/2024/1318)', licensed under the MIT license. 
 
 ## Original Work Attribution
 - **Original Repository**: https://github.com/KAIST-CryptLab/refined-tfhe-lhe
