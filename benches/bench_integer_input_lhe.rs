@@ -10,235 +10,26 @@ criterion_group!(
     name = benches;
     config = Criterion::default().sample_size(1000);
     targets =
+        criterion_benchmark_improved_revtr,
         criterion_benchmark_high_prec_improved_wopbs,
 );
 criterion_main!(benches);
 
+
+
 #[allow(unused)]
-fn criterion_benchmark_wopbs(c: &mut Criterion) {
+fn criterion_benchmark_improved_revtr(c: &mut Criterion) {
     let mut group = c.benchmark_group("wopbs");
 
     let param_list = [
-        (*WOPBS_2_2, "wopbs_2_2"),
-        (*WOPBS_3_3, "wopbs_3_3"),
-        (*WOPBS_4_4, "wopbs_4_4"),
-    ];
-
-    for (param, id) in param_list.iter() {
-        let lwe_dimension = param.lwe_dimension();
-        let lwe_modular_std_dev = param.lwe_modular_std_dev();
-        let glwe_dimension = param.glwe_dimension();
-        let polynomial_size = param.polynomial_size();
-        let glwe_modular_std_dev = param.glwe_modular_std_dev();
-        let pbs_base_log = param.pbs_base_log();
-        let pbs_level = param.pbs_level();
-        let ks_base_log = param.ks_base_log();
-        let ks_level = param.ks_level();
-        let pfks_base_log = param.pfks_base_log();
-        let pfks_level = param.pfks_level();
-        let cbs_base_log = param.cbs_base_log();
-        let cbs_level = param.cbs_level();
-        let ciphertext_modulus = param.ciphertext_modulus();
-        let message_size = param.message_size();
-
-        let glwe_size = glwe_dimension.to_glwe_size();
-
-        // Set random generators and buffers
-        let mut boxed_seeder = new_seeder();
-        let seeder = boxed_seeder.as_mut();
-
-        let mut secret_generator = SecretRandomGenerator::<ActivatedRandomGenerator>::new(seeder.seed());
-        let mut encryption_generator = EncryptionRandomGenerator::<ActivatedRandomGenerator>::new(seeder.seed(), seeder);
-
-        // Generate keys
-        let (
-            lwe_sk,
-            glwe_sk,
-            lwe_sk_after_ks,
-            bsk,
-            ksk,
-        ) = keygen_pbs(
-            lwe_dimension,
-            glwe_dimension,
-            polynomial_size,
-            lwe_modular_std_dev,
-            glwe_modular_std_dev,
-            pbs_base_log,
-            pbs_level,
-            ks_base_log,
-            ks_level,
-            &mut secret_generator,
-            &mut encryption_generator,
-        );
-        let bsk = bsk.as_view();
-
-        let ksk = allocate_and_generate_new_lwe_keyswitch_key(
-            &lwe_sk,
-            &lwe_sk_after_ks,
-            ks_base_log,
-            ks_level,
-            lwe_modular_std_dev,
-            ciphertext_modulus,
-            &mut encryption_generator,
-        );
-
-        let pfpksk_list = allocate_and_generate_new_circuit_bootstrap_lwe_pfpksk_list(
-            &lwe_sk,
-            &glwe_sk,
-            pfks_base_log,
-            pfks_level,
-            glwe_modular_std_dev,
-            ciphertext_modulus,
-            &mut encryption_generator,
-        );
-
-        // Set input LWE ciphertext
-        let msg = (1 << message_size) - 1;
-        let lwe = allocate_and_encrypt_new_lwe_ciphertext(
-            &lwe_sk,
-            Plaintext(msg << (u64::BITS as usize - message_size)),
-            glwe_modular_std_dev,
-            ciphertext_modulus,
-            &mut encryption_generator,
-        );
-
-        // Bench
-        let fft = Fft::new(polynomial_size);
-        let fft = fft.as_view();
-
-        let mut buffers = ComputationBuffers::new();
-        buffers.resize(
-            extract_bits_scratch::<u64>(
-                ksk.input_key_lwe_dimension(),
-                ksk.output_key_lwe_dimension(),
-                glwe_size,
-                polynomial_size,
-                fft,
-            )
-            .unwrap()
-            .unaligned_bytes_required(),
-        );
-        let mut stack = buffers.stack();
-
-        let mut lwe_list = LweCiphertextList::new(0u64, lwe_sk_after_ks.lwe_dimension().to_lwe_size(), LweCiphertextCount(message_size), ciphertext_modulus);
-
-        group.bench_function(
-            BenchmarkId::new(
-                "WoP-PBS: BitExtraction",
-                id,
-            ),
-            |b| b.iter(|| {
-                extract_bits(
-                    black_box(lwe_list.as_mut_view()),
-                    black_box(lwe.as_view()),
-                    black_box(ksk.as_view()),
-                    black_box(bsk),
-                    black_box(DeltaLog(u64::BITS as usize - message_size)),
-                    black_box(ExtractedBitsCount(message_size)),
-                    black_box(fft),
-                    black_box(stack.rb_mut()),
-                );
-            }),
-        );
-
-        buffers.resize(
-            circuit_bootstrap_boolean_scratch::<u64>(
-                lwe_sk_after_ks.lwe_dimension().to_lwe_size(),
-                bsk.output_lwe_dimension().to_lwe_size(),
-                glwe_size,
-                polynomial_size,
-                fft,
-            )
-            .unwrap()
-            .unaligned_bytes_required(),
-        );
-        let mut stack = buffers.stack();
-
-        let mut vec_lev = vec![
-            LweCiphertextList::new(
-                u64::ZERO,
-                bsk.output_lwe_dimension().to_lwe_size(),
-                LweCiphertextCount(cbs_level.0),
-                ciphertext_modulus,
-            ); message_size];
-
-        group.bench_function(
-            BenchmarkId::new(
-                "WoP-PBS: Refr.",
-                id,
-            ),
-            |b| b.iter(|| {
-                for (lwe_in, mut lev) in lwe_list.iter().zip(vec_lev.iter_mut()) {
-                    lwe_msb_bit_to_lev(
-                        black_box(&lwe_in),
-                        black_box(&mut lev),
-                        black_box(bsk),
-                        black_box(cbs_base_log),
-                        black_box(cbs_level),
-                        black_box(LutCountLog(0)),
-                    );
-                }
-            })
-        );
-
-        let mut ggsw_list = GgswCiphertextList::new(u64::ZERO, glwe_size, polynomial_size, cbs_base_log, cbs_level, GgswCiphertextCount(message_size), ciphertext_modulus);
-
-        group.bench_function(
-            BenchmarkId::new(
-                "WoP-PBS: Conv.",
-                id,
-            ),
-            |b| b.iter(|| {
-                for (lev, mut ggsw) in vec_lev.iter().zip(ggsw_list.iter_mut()) {
-                    for (lwe, mut ggsw_level_matrix) in lev.iter().zip(ggsw.iter_mut()) {
-                        for (pfpksk, mut glwe) in pfpksk_list.iter()
-                            .zip(ggsw_level_matrix.as_mut_glwe_list().iter_mut())
-                        {
-                            private_functional_keyswitch_lwe_ciphertext_into_glwe_ciphertext(
-                                black_box(&pfpksk),
-                                black_box(&mut glwe),
-                                black_box(&lwe),
-                            );
-                        }
-                    }
-                }
-            }),
-        );
-
-        let mut max_err = 0u64;
-        for (i, ggsw) in ggsw_list.iter().enumerate() {
-            let cur_err = get_max_err_ggsw_bit(
-                &glwe_sk,
-                ggsw.as_view(),
-                (msg & (1 << i)) >> i,
-            );
-            max_err = std::cmp::max(max_err, cur_err);
-        }
-
-        println!(
-"n: {}, N: {}, k: {}, l_pbs: {}, B_pbs: 2^{}, l_cbs: {}, B_cbs: 2^{}
-l_pfpks: {}, B_pfpks: 2^{},
-err: {:.2} bits",
-            lwe_dimension.0, polynomial_size.0, glwe_dimension.0, pbs_level.0, pbs_base_log.0, cbs_level.0, cbs_base_log.0,
-            pfks_level.0, pfks_base_log.0,
-            (max_err as f64).log2(),
-        );
-    }
-}
-
-#[allow(unused)]
-fn criterion_benchmark_improved_wopbs(c: &mut Criterion) {
-    let mut group = c.benchmark_group("wopbs");
-
-    let param_list = [
-        (*INT_LHE_BASE_64_MINI, 1, "INT_LHE_BASE_64_MINI extract 1-bit"),
-        (*INT_LHE_BASE_64_MINI, 2, "INT_LHE_BASE_64_MINI extract 2-bit"),
-        (*INT_LHE_BASE_64_MINI, 3, "INT_LHE_BASE_64_MINI extract 3-bit"),
+        (*INT_LHE_BASE_64_TWEAK, 1, "INT_LHE_BASE_64_TWEAK extract 1-bit"),
+        (*INT_LHE_BASE_64_TWEAK, 2, "INT_LHE_BASE_64_TWEAK extract 2-bit"),
+        (*INT_LHE_BASE_64_TWEAK, 3, "INT_LHE_BASE_64_TWEAK extract 3-bit"),
         (*INT_LHE_BASE_64_REV, 1, "INT_LHE_BASE_64_REV extract 1-bit"),
         (*INT_LHE_BASE_64_REV, 2, "INT_LHE_BASE_64_REV extract 2-bit"),
         (*INT_LHE_BASE_64_REV, 3, "INT_LHE_BASE_64_REV extract 3-bit"),
-        (*INT_LHE_BASE_256_MINI, 1, "INT_LHE_BASE_256_MINI extract 1-bit"),
-        (*INT_LHE_BASE_256_MINI, 2, "INT_LHE_BASE_256_MINI extract 2-bit"),
+        (*INT_LHE_BASE_256_TWEAK, 1, "INT_LHE_BASE_256_TWEAK extract 1-bit"),
+        (*INT_LHE_BASE_256_TWEAK, 2, "INT_LHE_BASE_256_TWEAK extract 2-bit"),
         (*INT_LHE_BASE_256_REV, 1, "INT_LHE_BASE_256_REV extract 1-bit"),
         (*INT_LHE_BASE_256_REV, 2, "INT_LHE_BASE_256_REV extract 2-bit"),
     ];

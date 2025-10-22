@@ -214,7 +214,7 @@ lazy_static! {
     );
     
     // SAME AS INT_LHE_BASE_64, but only removed the KS_TO_LARGE, KS_FROM_LARGE & adjusted Auto base
-    pub static ref INT_LHE_BASE_64_MINI: IntLheParam<u64> = IntLheParam::new(
+    pub static ref INT_LHE_BASE_64_TWEAK: IntLheParam<u64> = IntLheParam::new(
         LweDimension(873), // lwe_dimension
         STD_DEV_873, // lwe_modular_std_dev
         PolynomialSize(2048), // polynomial_size
@@ -237,7 +237,7 @@ lazy_static! {
     );
 
     // SAME AS INT_LHE_BASE_256, but only removed the KS_TO_LARGE, KS_FROM_LARGE & adjusted Auto base
-    pub static ref INT_LHE_BASE_256_MINI: IntLheParam<u64> = IntLheParam::new(
+    pub static ref INT_LHE_BASE_256_TWEAK: IntLheParam<u64> = IntLheParam::new(
         LweDimension(953), // lwe_dimension
         STD_DEV_953, // lwe_modular_std_dev
         PolynomialSize(2048), // polynomial_size

@@ -22,7 +22,7 @@ criterion_main!(benches);
 fn criterion_benchmark_packlwes(c: &mut Criterion) {
     let mut group = c.benchmark_group("PackLWEs");
     let param_list = [
-        // (*INT_LHE_BASE_64_REV, 1, "INT_LHE_BASE_64_REV PackLWEs"),
+        (*INT_LHE_BASE_64_REV, 1, "INT_LHE_BASE_64_REV PackLWEs"),
         (*INT_LHE_BASE_256_REV, 1, "INT_LHE_BASE_256_REV PackLWEs"),
     ];
 
@@ -223,7 +223,7 @@ fn criterion_benchmark_high_prec_packlwes(c: &mut Criterion) {
     let mut group = c.benchmark_group("PackLWEs");
 
     let param_list = [
-        // (*INT_LHE_BASE_64, 1, "INT_LHE_BASE_64 HighPrec PackLWEs"),
+        (*INT_LHE_BASE_64, 1, "INT_LHE_BASE_64 HighPrec PackLWEs"),
         (*INT_LHE_BASE_256, 1, "INT_LHE_BASE_256 HighPrec PackLWEs"),
     ];
     

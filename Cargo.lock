@@ -621,6 +621,7 @@ version = "0.1.0"
 dependencies = [
  "aes",
  "aligned-vec",
+ "concrete-csprng",
  "concrete-fft",
  "criterion",
  "dyn-stack",

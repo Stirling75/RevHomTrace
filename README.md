@@ -8,25 +8,26 @@ This is an implementation of '[**Homomorphic Field Trace Revisited : Breaking th
 
 ## Contents 
 We extended the original library by implementing
-- RevHomTrace Algorithm [automorphism_rev.rs](src/automorphism_rev.rs) with 1bit modulus switching in [mod_switch_rev.rs](src/mod_switch_rev.rs)
-- CBS (Circuit Bootstrapping) with RevHomTrace [ggsw_conv_rev.rs](src/ggsw_conv_rev.rs)
-- LWEs-to-GLWE packing algorithms via EvalAuto (MS-PackLWEs, HP-PackLWEs) [glwe_conv_rev.rs](src/glwe_conv_rev.rs)
-- CGGI16, MS18 Packing KS [lwe_to_glwe.rs](src/lwe_to_glwe.rs)
+- **RevHomTrace Algorithm** [automorphism_rev.rs](src/automorphism_rev.rs) with 1bit modulus switching in [mod_switch_rev.rs](src/mod_switch_rev.rs)
+- **CBS (Circuit Bootstrapping) with RevHomTrace** [ggsw_conv_rev.rs](src/ggsw_conv_rev.rs)
+- **LWEs-to-GLWE packing** algorithms via EvalAuto (MS-PackLWEs, HP-PackLWEs) [glwe_conv_rev.rs](src/glwe_conv_rev.rs)
+- **CGGI16, MS18 Packing KS** [lwe_to_glwe.rs](src/lwe_to_glwe.rs)
 
 We implemented benchmarks for:
-- Comparison between three different automorphism algorithms (PreHomTrace (Sec. 3.1.2), RevHomTrace (Sec. 3.2), HP-HomTrace (Sec. 3.1.2)), for experimental results in Section 4.1 
+- **Comparison between three different automorphism algorithms** (PreHomTrace (Sec. 3.1.2), RevHomTrace (Sec. 3.2), HP-HomTrace (Sec. 3.1.2)), for experimental results in Section 4.1 
   - Latency [bench_auto.rs](benches/bench_auto.rs)
-  - Error Comparison [bench_auto.rs](benches/bench_auto_err.rs)
-- Comparison between High Precision CBS, for experimental results in Section 4.2
+  - Error Comparison [bench_auto_err.rs](benches/bench_auto_err.rs)
+- **Comparison between High Precision CBS**, for experimental results in Section 4.2
   - [bench_integer_input_lhs.rs](benches/bench_integer_input_lhe.rs)
-- Comparison between Packing LWEs-to-GLWE algorithms (PackLWEs, MS-PackLWEs, HP-PackLWEs), for experimental results in Section 4.3
+- **Comparison between Packing LWEs-to-GLWE algorithms** (PackLWEs, MS-PackLWEs, HP-PackLWEs), for experimental results in Section 4.3
   - Latency [bench_ks.rs](benches/bench_ks.rs)
   - Error Comparison [bench_ks_err.rs](benches/bench_ks_err.rs)
 
-- Additional code for Packing LWEs-to-GLWE with traditional packing KS (PackKS, PackKS-rs), for experimental results in Section 4.3
+- **Additional code for Packing LWEs-to-GLWE** with traditional packing KS (**PackKS, PackKS-rs**), for experimental results in Section 4.3
   - Latency [bench_tradks.rs](benches/bench_tradks.rs)
   - Error Comparison [bench_tradks_err.rs](benches/bench_tradks_err.rs)
 
 ## How to Use
 - bench: `cargo bench --bench 'benchmark_name'`
+  - Example: '**cargo bench --bench bench_auto**'
   - Current sample size is set to 1000. 
