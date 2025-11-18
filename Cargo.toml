@@ -6,11 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-<<<<<<< HEAD
 tfhe = { version ="0.5.4", default-features = false, features = ["boolean", "shortint", "seeder_unix"]}
-=======
-tfhe = { version ="0.5.4", default-features = false, features = ["boolean", "shortint"]}
->>>>>>> 5ade4ccf30ba229fd6a002b805f4f8a77eae9e21
 concrete-csprng = { version = "0.4.1", default-features = false }
 rand = { version = "*" }
 aligned-vec = { version = "0.5.0" }
