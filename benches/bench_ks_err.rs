@@ -22,7 +22,7 @@ criterion_main!(benches);
 fn criterion_benchmark_packlwes(c: &mut Criterion) {
     let mut group = c.benchmark_group("PackLWEs");
     let param_list = [
-        // (*INT_LHE_BASE_64_REV, 1, "INT_LHE_BASE_64_REV PackLWEs"),
+        (*INT_LHE_BASE_64_REV, 1, "INT_LHE_BASE_64_REV PackLWEs"),
         (*INT_LHE_BASE_256_REV, 1, "INT_LHE_BASE_256_REV PackLWEs"),
     ];
 
@@ -133,7 +133,7 @@ fn criterion_benchmark_packlwes(c: &mut Criterion) {
 
         |b| {
             b.iter(|| {
-                let plain = PlaintextList::new(u64::ZERO, PlaintextCount(polynomial_size.0));
+                // let plain = PlaintextList::new(u64::ZERO, PlaintextCount(polynomial_size.0));
                 encrypt_lwe_ciphertext_list(
                     &lwe_sk,
                     &mut lwelist,
@@ -177,7 +177,7 @@ fn criterion_benchmark_packlwes(c: &mut Criterion) {
         ),
         |b| {
             b.iter(|| {
-                let plain = PlaintextList::new(u64::ZERO, PlaintextCount(polynomial_size.0));
+                // let plain = PlaintextList::new(u64::ZERO, PlaintextCount(polynomial_size.0));
                 encrypt_lwe_ciphertext_list(
                     &lwe_sk,
                     &mut lwelist,
@@ -207,8 +207,8 @@ fn criterion_benchmark_packlwes(c: &mut Criterion) {
 
 
         println!(
-            "n: {}, N: {}, k: {}, l_tr: {}, B_tr: 2^{},",
-            lwe_dimension.0, polynomial_size.0, glwe_dimension.0, auto_level.0, auto_base_log.0
+            "N: {}, k: {}, l_tr: {}, B_tr: 2^{},",
+            polynomial_size.0, glwe_dimension.0, auto_level.0, auto_base_log.0
         );
 
 }
@@ -223,7 +223,7 @@ fn criterion_benchmark_high_prec_packlwes(c: &mut Criterion) {
     let mut group = c.benchmark_group("PackLWEs");
 
     let param_list = [
-        // (*INT_LHE_BASE_64, 1, "INT_LHE_BASE_64 HighPrec PackLWEs"),
+        (*INT_LHE_BASE_64, 1, "INT_LHE_BASE_64 HighPrec PackLWEs"),
         (*INT_LHE_BASE_256, 1, "INT_LHE_BASE_256 HighPrec PackLWEs"),
     ];
     

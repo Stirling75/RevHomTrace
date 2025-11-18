@@ -6,7 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tfhe = { version = "0.5.3", features = ["boolean", "shortint", "x86_64-unix"] }
+tfhe = { version ="0.5.4", default-features = false, features = ["boolean", "shortint", "seeder_unix"]}
+concrete-csprng = { version = "0.4.1", default-features = false }
 rand = { version = "*" }
 aligned-vec = { version = "0.5.0" }
 dyn-stack = { version = "0.9" }
@@ -49,7 +50,7 @@ name = "bench_tradks"
 harness = false
 
 [features]
-default = ["monothread", "tfhe/boolean", "tfhe/shortint", "tfhe/x86_64-unix"]
+default = ["monothread", "tfhe/boolean", "tfhe/shortint"]
 monothread = []
 multithread = ["rayon"]
 nightly-avx512 = ["tfhe/nightly-avx512"]
