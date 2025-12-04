@@ -1,0 +1,56 @@
+[package]
+name = "refined-tfhe-lhe"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tfhe = { version ="0.5.4", default-features = false, features = ["boolean", "shortint", "seeder_unix"]}
+concrete-csprng = { version = "0.4.1", default-features = false }
+rand = { version = "*" }
+aligned-vec = { version = "0.5.0" }
+dyn-stack = { version = "0.9" }
+aes = { version = "*" }
+rayon = { version = "*", optional = true }
+pulp = "0.18.8"
+lazy_static = "1.4"
+itertools = "0.14.0"
+
+[dev-dependencies]
+criterion = { version = "0.4", features = ["html_reports"] }
+concrete-fft = { version = "0.4.0", features = ["serde"] }
+
+[[bench]]
+name = "bench_integer_input_lhe"
+harness = false
+
+[[bench]]
+name = "bench_ks"
+harness = false
+
+[[bench]]
+name = "bench_ks_err"
+harness = false
+
+[[bench]]
+name = "bench_auto"
+harness = false
+
+[[bench]]
+name = "bench_auto_err"
+harness = false
+
+[[bench]]
+name = "bench_tradks_err"
+harness = false
+
+[[bench]]
+name = "bench_tradks"
+harness = false
+
+[features]
+default = ["monothread", "tfhe/boolean", "tfhe/shortint"]
+monothread = []
+multithread = ["rayon"]
+nightly-avx512 = ["tfhe/nightly-avx512"]
